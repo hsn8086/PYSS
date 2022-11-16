@@ -43,11 +43,11 @@ class Server:
                         if file_hash != self.files_hash[path]:
                             self.files_hash[path] = file_hash
 
-                            module = importlib.reload(importlib.import_module(module_name))
+                            importlib.reload(importlib.import_module(module_name))
                     else:
-                        module = importlib.import_module(module_name)
-                        self.files_hash[path] = file_hash
 
+                        self.files_hash[path] = file_hash
+                module = importlib.import_module(module_name)
                 func_main: FunctionType = getattr(module, 'main')
 
                 try:

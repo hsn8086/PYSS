@@ -1,5 +1,5 @@
 def main():
-    return 'ok'
+    return 'ok1'
 
 
 return_type = 'text/plain'
