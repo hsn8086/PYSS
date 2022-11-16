@@ -1,3 +1,4 @@
+import hashlib
 import importlib
 import logging
 import os.path
@@ -27,13 +28,26 @@ class Server:
         self.ver = '0.0.1'
         self.logger = logging.getLogger(__name__)
 
+        self.files_hash = {}
+
         @self.app.route('/<path:name>', methods=['GET'])
         def main(name: str):
             path = os.path.join('scripts', *(name.split('/')))
             module_name = '.'.join(['scripts'] + name.split('.')[0].split('/'))
             req_data = request_parse(request)
             if os.path.exists(path):
-                module = importlib.import_module(module_name)
+                with open(path, 'rb') as f:
+                    file_hash = hashlib.sha1(f.read()).hexdigest()
+                    if path in self.files_hash:
+
+                        if file_hash != self.files_hash[path]:
+                            self.files_hash[path] = file_hash
+
+                            module = importlib.reload(importlib.import_module(module_name))
+                    else:
+                        module = importlib.import_module(module_name)
+                        self.files_hash[path] = file_hash
+
                 func_main: FunctionType = getattr(module, 'main')
 
                 try:
